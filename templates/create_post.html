@@ -1,0 +1,145 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Create - Instagram{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/create_posts.css' %}">
+<div class="create-container">
+    <!-- Header -->
+    <header class="create-header">
+        <div class="header-content">
+            <button class="btn-back" onclick="goBack()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <h1>Create</h1>
+            <div style="width: 24px;"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="create-content">
+        <!-- Left Side - Upload Area -->
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept="image/*,video/*" hidden>
+                <div class="upload-placeholder">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <p class="upload-title">Drag photos and videos here</p>
+                    <p class="upload-subtitle">or select from your computer</p>
+                </div>
+            </div>
+
+            <!-- Preview Area -->
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-container">
+                    <img id="previewImage" style="display: none;" alt="Preview">
+                    <video id="previewVideo" style="display: none;" controls></video>
+                </div>
+                <button class="btn-change-file" onclick="document.getElementById('fileInput').click()">
+                    Change
+                </button>
+            </div>
+
+            <!-- Content Type Tabs -->
+            <div class="content-type-tabs">
+                <button class="tab-btn active" data-type="post" onclick="switchContentType('post')">
+                    Post
+                </button>
+                <button class="tab-btn" data-type="reel" onclick="switchContentType('reel')">
+                    Reel
+                </button>
+
+                <button class="tab-btn" data-type="story" onclick="switchContentType('story')">
+                    Story
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Side - Details -->
+        <div class="details-section">
+            <!-- User Info -->
+            <div class="user-info">
+                <img src="{{ users.avatar.url }}" alt="User avatar" class="user-avatar">
+                <div class="user-details">
+                    <p class="username">{{ user.first_name }} {{ user.last_name }}</p>
+                    <p class="account-type">Public Account</p>
+                </div>
+            </div>
+
+            <!-- Caption -->
+            <div class="form-group">
+                <label>Caption</label>
+                <textarea id="caption" class="caption-input" placeholder="Write a caption..."
+                          maxlength="2200"></textarea>
+                <p class="char-count"><span id="charCount">0</span>/2200</p>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label>Add location</label>
+                <input type="text" placeholder="Search locations..." class="location-input">
+            </div>
+
+            <!-- Accessibility -->
+            <div class="form-group">
+                <label>Accessibility</label>
+                <input type="text" placeholder="Alt text" class="alt-text-input">
+            </div>
+
+            <!-- Filters -->
+            <div class="form-group">
+                <label>Filter</label>
+                <div class="filters-grid">
+                    <button class="filter-btn active" data-filter="original">Original</button>
+                    <button class="filter-btn" data-filter="clarendon">Clarendon</button>
+                    <button class="filter-btn" data-filter="gingham">Gingham</button>
+                    <button class="filter-btn" data-filter="juno">Juno</button>
+                    <button class="filter-btn" data-filter="lark">Lark</button>
+                    <button class="filter-btn" data-filter="ludwig">Ludwig</button>
+                </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="allowComments" checked>
+                    Turn off commenting
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="hideLikes">
+                    Hide like and view counts
+                </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-secondary" type="submit">Save as draft</button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{% url 'posts:create_post' %}">
+                {% csrf_token %}
+                <input type="file" name="contentUrl" accept="image/*,video/*" required>
+                <textarea name="caption" placeholder="Подпись..."></textarea>
+                <input type="hidden" name="post_type" value="post"> <!-- или меняй JS'ом -->
+                <button type="submit">Поделиться</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock  %}
+
+{% block extra_js %}
+<script src="{% static 'js/create_posts.js' %}"></script>
+{% endblock  %}

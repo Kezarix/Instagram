@@ -1,0 +1,149 @@
+{% extends 'layouts/base.html' %}
+
+{% load my_tags %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+
+<style>
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+
+    <!-- LEFT: MEDIA -->
+    <div class="post-media">
+        {% if post.post_type == 'REELS' %}
+        <video controls autoplay muted loop>
+            <source src="{{ post.contentUrl.url }}">
+        </video>
+        {% else %}
+        <img src="{{ post.contentUrl.url }}" alt="">
+        {% endif %}
+    </div>
+
+    <!-- RIGHT: INFO -->
+    <div class="post-info">
+
+        <div class="post-header">
+            <strong>{{ post.author.username }}</strong>
+            {% if not request|is_following:post.author %}
+            <a href="{% url 'users:follow' pk=post.author.pk %}?next={{ request.get_full_path }}">
+                <button class="follow-btn">Follow</button>
+            </a>
+            {% endif %}
+        </div>
+
+        {% if post.caption %}
+        <div class="post-caption">
+            <strong>{{ post.author.username }}</strong>
+            {{ post.caption }}
+        </div>
+        {% endif %}
+
+        <div class="post-comments">
+            {% for comment in comments %}
+            <div class="comment-block">
+                <!-- Родительский комментарий -->
+                <div class="comment">
+                    <div class="comment-header">
+                        <strong>{{ comment.user.username }}</strong>
+                        <span class="comment-time">{{ comment.created_at|timesince }}</span>
+                    </div>
+                    <p>{{ comment.text }}</p>
+
+                    <!-- Actions: like + reply -->
+                    <div class="comment-actions">
+                        <a href="{% url 'posts:toggle_comment_like' pk=comment.pk %}?next={{ request.path}}?{{ request.GET.urlencode }}"
+                           class="like-btn">
+                            <i class="{% post_comment_heart_icon request comment %}" style="color: #ff0000;"></i>
+                            {{ comment.comment_like.count }}
+                        </a>
+
+                        <!-- Кнопка "Ответить" -->
+                        <button type="button" class="reply-toggle-btn" data-comment-id="{{ comment.id }}">
+                            Ответить
+                        </button>
+                    </div>
+
+                    <!-- Форма для ответа -->
+                    <form action="{% url 'posts:reply_comment' pk=comment.pk %}" method="POST"
+                          class="reply-form" id="reply-form-{{ comment.id }}">
+                        {% csrf_token %}
+                        <input type="text" name="reply_comment" placeholder="Напишите ответ..." required>
+                        <button type="submit">Отправить</button>
+                    </form>
+
+                    <!-- Replies -->
+                    <div class="replies">
+                        {% for reply in comment.reply_comment.all %}
+                        <div class="reply">
+                            <div class="comment-header">
+                                <strong>{{ reply.user.username }}</strong>
+                                <span class="comment-time">{{ reply.created_at|timesince }}</span>
+                            </div>
+                            <p>{{ reply.reply_comment }}</p>
+                            <div class="comment-actions">
+                                <a href="{% url 'posts:toggle_reply_like' pk=reply.pk %}?next={{ request.path }}"
+                                   class="like-btn">
+                                    <i class="{% reply_comment_heart_icon request reply %}" style="color: #ff0000;"></i>
+                                    {{ reply.reply_comment_likes.count }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="post-fixed-bottom">
+            <form action="{% url 'posts:create_comment' pk=post.pk %}" method="POST" class="comment-form-main">
+                {% csrf_token %}
+                <input type="text" name="text" placeholder="Добавьте комментарий..." required>
+                <button type="submit">Отправить</button>
+            </form>
+
+            <div class="post-footer">
+                <a href="{% url 'posts:toggle_like' pk=post.pk %}?next={{ request.path }}?{{ request.GET.urlencode }}"
+                   style="text-decoration: none;">
+                    <button id="like-btn" data-id="{{ post.pk }}">
+                        <i class="{% post_heart_icon request post %}" style="color: #ff0000;"></i>
+                        <span id="likes-count">{{ post.likes.count }}</span>
+                    </button>
+                </a>
+                <div class="date">{{ post.created_at|date:"d M Y" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Получаем все кнопки "Ответить"
+        const replyButtons = document.querySelectorAll('.reply-toggle-btn');
+
+        replyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const commentId = btn.dataset.commentId;
+                const form = document.getElementById(`reply-form-${commentId}`);
+
+                // Переключаем видимость формы
+                if (form.style.display === 'none' || form.style.display === '') {
+                    form.style.display = 'flex';
+                    form.querySelector('input').focus();
+                } else {
+                    form.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

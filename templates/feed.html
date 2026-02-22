@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная • Instagram{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .story-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.story-modal.hidden {
+  display: none;
+}
+
+.story-content img,
+.story-content video {
+  max-height: 90vh;
+  max-width: 90vw;
+  border-radius: 10px;
+}
+
+
+</style>
+<div class="feed-wrapper">
+    <div class="feed-container">
+        <section class="feed-posts">
+            {% for post in posts %}
+            <article class="post-card">
+                <!-- Post Header -->
+                <div class="post-header">
+                    <div class="post-user">
+                        <img
+                                src="{{ post.author.avatar.url }}"
+                                class="avatar-sm story-avatar"
+                                data-user-id="{{ post.author.id }}"
+                                alt="{{ post.author.username }}"
+                        >
+
+                        <div class="user-info">
+                            <a href="{% url 'profile' post.author.username %}" class="username">
+                                {{ post.author.username }}
+                            </a>
+                            <span class="post-location">{{ post.location|default:"" }}</span>
+                        </div>
+                    </div>
+                    <button class="post-menu" aria-label="More options">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2">
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Post Image -->
+                <div class="post-image-container">
+                    <img src="{{ post.image.url }}" alt="Post by {{ post.author.username }}" class="post-image">
+                </div>
+
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <div class="action-left">
+                        <button class="action-btn like-btn" data-post-id="{{ post.id }}">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn comment-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn share-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="action-btn save-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Post Stats -->
+                <div class="post-stats">
+                    <div class="likes-count">
+                        <img src="{{ post.likes.first.user.avatar.url|default:'https://via.placeholder.com/20' }}"
+                             alt="Liked by" class="likes-avatar">
+                        <span><strong id="likes-count-{{ post.id }}">{{ post.likes.count }}</strong> отметок «Нравится»</span>
+                    </div>
+                </div>
+
+                <!-- Post Caption -->
+                <div class="post-caption">
+                    <p>
+                        <a href="{% url 'profile' post.author.username %}" class="username-link">{{ post.author.username
+                            }}</a>
+                        {{ post.caption|truncatewords:30 }}
+                    </p>
+                </div>
+
+                <!-- View Comments -->
+                <a href="{% url 'post_detail' pk=post.pk %}" class="view-comments">
+                    Показать все комментарии ({{ post.comments.count }})
+                </a>
+
+                <!-- Post Time -->
+                <div class="post-time">
+                    {{ post.created_at|timesince }} назад
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <h2>Поделитесь фотографией</h2>
+                <p>Когда вы поделитесь фотографией, они появятся в вашем профиле.</p>
+            </div>
+            {% endfor %}
+        </section>
+
+        <!-- Sidebar -->
+        <aside class="feed-sidebar">
+            <!-- User Card -->
+            <div class="sidebar-user">
+                <img src="{{ request.user.avatar.url }}" alt="{{ request.user.username }}" class="avatar-lg">
+                <div class="user-details">
+                    <a href="{% url 'profile' request.user.username %}" class="username-main">
+                        {{ request.user.username }}
+                    </a>
+                    <span class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                </div>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <h3>Рекомендации для вас</h3>
+                    <a href="#" class="see-all">Смотреть все</a>
+                </div>
+                <div class="suggestions-list">
+                    <div class="suggestion-item">
+                        <img src="https://via.placeholder.com/32" alt="User" class="avatar-sm">
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">username</div>
+                            <div class="suggestion-subtitle">Рекомендация</div>
+                        </div>
+                        <button class="follow-btn">Подписаться</button>
+                    </div>
+                    <div class="suggestion-item">
+                        <img src="https://via.placeholder.com/32" alt="User" class="avatar-sm">
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">username</div>
+                            <div class="suggestion-subtitle">Рекомендация</div>
+                        </div>
+                        <button class="follow-btn">Подписаться</button>
+                    </div>
+                    <div class="suggestion-item">
+                        <img src="https://via.placeholder.com/32" alt="User" class="avatar-sm">
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">username</div>
+                            <div class="suggestion-subtitle">Рекомендация</div>
+                        </div>
+                        <button class="follow-btn">Подписаться</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <p>О нас Помощь Пресса API Вакансии Приватность Условия Места</p>
+                <p>© 2024 Instagram Clone</p>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<div id="story-modal" class="story-modal hidden">
+    <div class="story-content" id="story-content"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+    <script>
+document.querySelectorAll(".story-avatar").forEach(avatar => {
+  avatar.addEventListener("click", async () => {
+    const userId = avatar.dataset.userId;
+
+    const response = await fetch(`/stories/${userId}/`);
+    const stories = await response.json();
+
+    if (!stories.length) return;
+
+    const modal = document.getElementById("story-modal");
+    const content = document.getElementById("story-content");
+
+    let index = 0;
+
+    function showStory(i) {
+      const story = stories[i];
+      content.innerHTML = "";
+
+      if (story.type === "photo") {
+        content.innerHTML = `<img src="${story.src}">`;
+        setTimeout(nextStory, 5000);
+      } else {
+        content.innerHTML = `<video src="${story.src}" autoplay></video>`;
+        content.querySelector("video").onended = nextStory;
+      }
+    }
+
+    function nextStory() {
+      index++;
+      if (index < stories.length) {
+        showStory(index);
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    modal.classList.remove("hidden");
+    showStory(index);
+
+    modal.onclick = () => modal.classList.add("hidden");
+  });
+});
+</script>
+
+
+</script>

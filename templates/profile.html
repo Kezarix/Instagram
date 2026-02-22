@@ -1,0 +1,529 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% load my_tags %}
+
+{% block title %}{{ user.username }} - Instagram Clone{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ==================== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ==================== */
+:root {
+  --primary-bg: #ffffff;
+  --secondary-bg: #fafafa;
+  --border-color: #e5e5e5;
+  --text-primary: #000000;
+  --text-secondary: #65676b;
+  --text-light: #a8a8a8;
+  --accent-color: #0095f6;
+  --accent-hover: #0980d9;
+  --danger-color: #e74c3c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--primary-bg);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+/* ==================== КОНТЕЙНЕР ПРОФИЛЯ ==================== */
+.profile-container {
+  max-width: 975px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* ==================== ЗАГОЛОВОК ПРОФИЛЯ ==================== */
+.profile-header {
+  display: flex;
+  gap: 64px;
+  margin-bottom: 60px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profile-avatar-wrapper {
+  flex-shrink: 0;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary-bg);
+  box-shadow: 0 0 0 1px var(--border-color);
+}
+
+/* ==================== ИНФОРМАЦИЯ О ПРОФИЛЕ ==================== */
+.profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.profile-username {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+/* ==================== КНОПКИ ==================== */
+.btn {
+  padding: 8px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+/* ==================== СТАТИСТИКА ==================== */
+.profile-stats {
+  display: flex;
+  gap: 40px;
+  margin: 20px 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-number {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ==================== БИО ПРОФИЛЯ ==================== */
+.profile-bio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.full-name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.bio-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.website-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.website-link:hover {
+  text-decoration: underline;
+}
+
+/* ==================== ТАБЫ ==================== */
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin: 40px 0 30px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text-light);
+}
+
+.tab-btn.active {
+  color: var(--text-primary);
+  border-top: 1px solid var(--text-primary);
+  padding-top: 7px;
+  margin-top: -17px;
+}
+
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
+}
+
+/* ==================== СЕТКА ПОСТОВ ==================== */
+.profile-posts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.post-grid-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background-color: var(--secondary-bg);
+  overflow: hidden;
+  border-radius: 4px;
+  cursor: pointer;
+  /* Removed: group/post: hover; (Invalid CSS syntax) */
+}
+
+.post-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Removed: '\' */
+  transition: transform 0.3s ease;
+}
+
+.post-grid-item:hover img {
+  transform: scale(1.05);
+}
+
+.post-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.post-grid-item:hover .post-overlay {
+  opacity: 1;
+}
+
+.overlay-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ==================== ПУСТОЕ СОСТОЯНИЕ ==================== */
+.empty-posts {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
+.no-posts {
+  font-size: 16px;
+  text-align: center;
+}
+
+/* ==================== АДАПТИВНЫЙ ДИЗАЙН ==================== */
+
+/* Планшеты (768px) */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-info {
+    text-align: center;
+  }
+
+  .profile-top {
+    justify-content: center;
+  }
+
+  .profile-stats {
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .profile-tabs {
+    gap: 30px;
+    padding-top: 12px;
+  }
+
+  .profile-posts {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .profile-username {
+    font-size: 24px;
+  }
+}
+
+/* Мобильные телефоны (480px) */
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 15px 10px;
+  }
+
+  .profile-header {
+    margin-bottom: 20px;
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-username {
+    font-size: 20px;
+  }
+
+  .stat-number {
+    font-size: 16px;
+  }
+
+  .profile-stats {
+    gap: 20px;
+  }
+
+  .profile-tabs {
+    gap: 15px;
+    padding-top: 10px;
+  }
+
+  .tab-btn {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .tab-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .profile-posts {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .overlay-stat {
+    font-size: 12px;
+    gap: 4px;
+  }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Header профиля -->
+    <div class="profile-header">
+        <div class="profile-avatar-wrapper">
+            {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="profile-avatar">
+            {% else %}
+            <img src="{% static 'images/img.png' %}" alt="{{ user.username }}" class="profile-avatar">
+            {% endif %}
+        </div>
+
+
+        <div class="profile-info">
+            <div class="profile-top">
+                <h1 class="profile-username">{{ user.username }}</h1>
+                {% if request.user.pk == user.pk %}
+                <button class="btn btn-secondary">Редактировать профиль</button>
+                {% else %}
+                {% if request|is_following:user %}
+                <a href="{% url 'users:unfollow' pk=user.pk %}?next={{ request.path }}?{{ request.GET.urlencode }}">
+                    <button class="btn btn-secondary">Unfollow</button>
+                </a>
+                {% else %}
+                <a href="{% url 'users:follow' pk=user.pk %}?next={{ request.path }}?{{ request.GET.urlencode }}">
+                    <button class="btn btn-primary">Follow</button>
+                </a>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat">
+                    <span class="stat-number">{{ posts.count }}</span>
+                    <span class="stat-label">публикаций</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-number">{{ user.followers.count }}</span>
+                    <span class="stat-label">подписчиков</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-number">{{ user.following.count }}</span>
+                    <span class="stat-label">подписок</span>
+                </div>
+            </div>
+
+            <div class="profile-bio">
+                {% if user.first_name or user.last_name %}
+                <p class="full-name">
+                    <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                </p>
+                {% endif %}
+
+                {% if user.bio %}
+                <p class="bio-text">{{ user.bio|linebreaksbr }}</p>
+                {% endif %}
+
+                {% if user.website %}
+                <a href="{{ user.website|urlize }}" class="website-link" target="_blank" rel="noopener noreferrer">
+                    {{ user.website|urlize }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Табы — ТОНКИЕ, как в настоящем Instagram (без больших кнопок!) -->
+    <div class="profile-tabs">
+        <div class="profile-tabs">
+            <button class="tab-btn active" onclick="switchTab(this, 'POST')">
+                <svg class="tab-icon">...</svg>
+                <span>Публикации</span>
+            </button>
+
+            <button class="tab-btn" onclick="switchTab(this, 'REELS')">
+                <svg class="tab-icon">...</svg>
+                <span>Reels</span>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Сетка постов (вертикальные 4:5) -->
+    <div class="profile-posts" id="postsContainer">
+        {% for post in posts %}
+        <a href="{% url 'posts:post_detail' post.id %}"
+           class="post-grid-item post-type-{{ post.post_type }}"
+           style="text-decoration: none; display: {% if post.post_type == 'POST' %}block{% else %}none{% endif %};">
+
+            {% if post.post_type == 'POST' or post.post_type == 'HISTORY' %}
+            <img src="{{ post.contentUrl.url }}" alt="Пост">
+            {% elif post.post_type == 'REELS' %}
+            <video src="{{ post.contentUrl.url }}" style="width: 100%; height: 100%; object-fit: cover;" muted
+                   loop></video>
+            {% endif %}
+
+            <div class="post-overlay">
+                <span class="overlay-stat">❤️ {{ post.likes.count }}</span>
+                <span class="overlay-stat">💬 {{ post.comments.count|add:post.reply_comment.count }}</span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="empty-posts">
+            <p class="no-posts">Нет публикаций</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+function switchTab(btn, type) {
+    // Убираем активный стиль у всех кнопок и даем нажатой
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Прячем все посты и показываем только те, что соответствуют типу (POST или REELS)
+    const allPosts = document.querySelectorAll('.post-grid-item');
+    allPosts.forEach(post => {
+        if (post.classList.contains('post-type-' + type)) {
+            post.style.display = 'block';
+        } else {
+            post.style.display = 'none';
+        }
+    });
+}
+</script>
+
+{% endblock %}

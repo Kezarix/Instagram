@@ -1,0 +1,70 @@
+{% load static %}
+<!-- Beautiful Instagram-style header with search, notifications, messages -->
+<header class="instagram-header">
+    <div class="header-container">
+        <!-- Left: Logo -->
+        <div class="header-logo">
+            <a href="/" class="logo-link">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="logo-icon">
+                    <rect x="2" y="2" width="20" height="20" rx="5"/>
+                    <circle cx="12" cy="12" r="4" fill="white"/>
+                    <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
+                </svg>
+                <span class="logo-text">Instagram</span>
+            </a>
+        </div>
+
+        <!-- Center: Search Bar -->
+        <div class="header-search">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+                type="text"
+                class="search-input"
+                placeholder="Поиск"
+                aria-label="Search"
+            >
+        </div>
+
+        <!-- Right: Action Buttons -->
+        <div class="header-actions">
+            <!-- Create Button -->
+            <a href="{% url 'posts:create_post' %}" class="action-btn create-btn" title="Создать">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+            </a>
+
+            <!-- Explore Button -->
+            <a href="{% url 'posts:explore' %}" class="action-btn explore-btn" title="Интересное">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+            </a>
+
+            <!-- Notifications -->
+            <div class="action-btn-group">
+                <button class="action-btn notifications-btn" id="notificationsBtn" title="Уведомления">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span class="notification-badge">3</span>
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div class="action-btn-group">
+                <a href="/" class="action-btn messages-btn" title="Сообщения">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span class="message-badge">2</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

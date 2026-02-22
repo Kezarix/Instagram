@@ -1,0 +1,301 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load my_tags %}
+
+{% block title %}Поиск • Instagram{% endblock %}
+
+{% block content %}
+<div class="search-wrapper">
+    <!-- Search Header -->
+    <div class="search-header">
+        <div class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <form method="get" class="search-form">
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Поиск"
+                    value="{{ request.GET.q|default:'' }}"
+                    class="search-input"
+                    autocomplete="off"
+                />
+            </form>
+        </div>
+    </div>
+
+    <!-- Users List -->
+    <div class="search-results">
+        {% if users %}
+            <ul class="user-list">
+                {% for user in users %}
+                <li class="user-item">
+                    <a href="{% url 'users:another-profile' user.pk %}" class="user-link">
+                        <!-- Avatar -->
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="user-avatar">
+                        {% else %}
+                            <div class="user-avatar-alt">
+                                {{ user.first_name.0|default:''|upper }}{{ user.last_name.0|default:''|upper }}
+                            </div>
+                        {% endif %}
+
+                        <!-- User Info -->
+                        <div class="user-info">
+                            <div class="username">{{ user.username }}</div>
+                            <div class="fullname">
+                                {% if user.first_name or user.last_name %}
+                                    {{ user.first_name }} {{ user.last_name }}
+                                {% else %}
+                                    Пользователь
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Follow Button -->
+                    {% if request.user.pk != user.pk %}
+                        {% if request|is_following:user %}
+                            <a href="{% url 'users:unfollow' pk=user.pk %}?next={{ request.path }}" class="follow-btn-search following">
+                                Следите
+                            </a>
+                        {% else %}
+                            <a href="{% url 'users:follow' pk=user.pk %}?next={{ request.path }}" class="follow-btn-search">
+                                Подписаться
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </div>
+                {% if request.GET.q %}
+                    <h3>Ничего не найдено</h3>
+                    <p>По запросу "{{ request.GET.q }}" ничего не найдено</p>
+                {% else %}
+                    <h3>Поиск пользователей</h3>
+                    <p>Введите имя пользователя или полное имя</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .search-wrapper {
+        background: #fff;
+        min-height: 100vh;
+        margin-left: 245px;
+    }
+
+    /* Search Header */
+    .search-header {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        padding: 16px;
+        border-bottom: 1px solid #e5e5e5;
+        z-index: 100;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f0f0f0;
+        border-radius: 24px;
+        padding: 10px 16px;
+        max-width: 600px;
+        color: #8e8e8e;
+    }
+
+    .search-box svg {
+        flex-shrink: 0;
+    }
+
+    .search-form {
+        width: 100%;
+    }
+
+    .search-input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        font-size: 15px;
+        color: #262626;
+    }
+
+    .search-input::placeholder {
+        color: #8e8e8e;
+    }
+
+    /* Search Results */
+    .search-results {
+        max-width: 600px;
+    }
+
+    .user-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .user-item {
+        border-bottom: 1px solid #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .user-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.15s ease;
+        flex: 1;
+    }
+
+    .user-link:hover {
+        background-color: #f5f5f5;
+    }
+
+    .follow-btn-search {
+        padding: 8px 20px;
+        background: #0a66c2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s ease;
+        margin-right: 12px;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .follow-btn-search:hover {
+        background: #0952a3;
+    }
+
+    .follow-btn-search.following {
+        background: #e4e6eb;
+        color: #262626;
+    }
+
+    .follow-btn-search.following:hover {
+        background: #dbdee5;
+    }
+
+    .user-avatar,
+    .user-avatar-alt {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        object-fit: cover;
+    }
+
+    .user-avatar-alt {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow: hidden;
+        flex: 1;
+    }
+
+    .username {
+        font-size: 15px;
+        font-weight: 600;
+        color: #262626;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fullname {
+        font-size: 13px;
+        color: #8e8e8e;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Empty State */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 24px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 96px;
+        height: 96px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        margin-bottom: 24px;
+        color: #8e8e8e;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #262626;
+        margin: 0 0 8px 0;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        color: #8e8e8e;
+        margin: 0;
+        max-width: 300px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .search-wrapper {
+            margin-left: 0;
+        }
+
+        .search-box {
+            max-width: 100%;
+        }
+
+        .user-avatar,
+        .user-avatar-alt {
+            width: 44px;
+            height: 44px;
+        }
+    }
+</style>
+{% endblock %}

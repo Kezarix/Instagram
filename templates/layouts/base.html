@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Instagram Clone">
+    <title>{% block title %}Instagram{% endblock %}</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/feed.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+          integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<!-- Left Sidebar -->
+{% include 'layouts/left_sidebar.html' %}
+
+<!-- Main Content -->
+<main style="margin-left: 245px;">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Scripts -->
+{% block extra_js %}{% endblock %}
+</body>
+</html>

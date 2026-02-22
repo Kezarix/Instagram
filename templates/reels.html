@@ -1,0 +1,227 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+  background-color: #000;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden; /* Prevent the body itself from scrolling */
+}
+
+    /* Container for reels */
+    .reels-container {
+  display: block; /* Changed from flex */
+  height: 100vh;
+  width: 100%;
+  max-width: 500px; /* Optional: standard mobile width for desktop viewing */
+  margin: 0 auto;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.reels-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+
+    .reel {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* This ensures each reel takes exactly the screen height */
+  scroll-snap-align: start; /* Changed from center for better reliability */
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  overflow: hidden;
+  background: #000;
+}
+
+    video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: 0;
+  object-fit: cover;
+}
+
+    /* Overlay gradient for text readability */
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+      z-index: 1;
+    }
+
+    /* Left side (caption & user info) */
+    .reel-info {
+      position: relative;
+      z-index: 2;
+      max-width: 65%;
+      padding: 20px;
+    }
+
+    .reel-info h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .reel-info p {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #ccc;
+    }
+
+    /* Right side (actions) */
+    .reel-actions {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .action img {
+      width: 35px;
+      height: 35px;
+      margin-bottom: 5px;
+    }
+
+    .action span {
+      font-size: 12px;
+    }
+
+    .like { color: #ff2e63; }
+    .comment { color: #fff; }
+    .share { color: #fff; }
+
+    /* Optional scrollbar styling */
+    .reels-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .reels-container::-webkit-scrollbar-thumb {
+      background-color: #555;
+      border-radius: 3px;
+    }
+
+    .user-avatar {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+    }
+
+    .user-avatar img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+    }
+
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="reels-container">
+    {% for reel in reels %}
+    <!-- Reel 1 -->
+    <div class="reel">
+        <video src="{{ reel.contentUrl.url }}" autoplay muted loop></video>
+        <div class="overlay"></div>
+        <div class="reel-info">
+            <div class="user-avatar">
+                {% if reel.author.avatar %}
+                <img class="avatar" src="{{ reel.author.avatar.url }}" alt="">
+                {% else %}
+                <img class="avatar" src="{%  static 'images/img.png' %}" alt="">
+                {% endif %}
+                <h3>{{ reel.author.username }}</h3>
+            </div>
+            <p>{{ reel.caption }}</p>
+            <p>{{ reel.hashtag }}</p>
+        </div>
+        <div class="reel-actions">
+            <div class="action like">
+                <img src="https://img.icons8.com/ios-glyphs/30/ffffff/like.png"/>
+                <span>1.2k</span>
+            </div>
+            <div class="action comment">
+                <img src="https://img.icons8.com/ios-glyphs/30/ffffff/topic.png"/>
+                <span>300</span>
+            </div>
+            <div class="action share">
+                <img src="https://img.icons8.com/ios-glyphs/30/ffffff/share.png"/>
+                <span>Share</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const options = {
+        root: document.querySelector('.reels-container'),
+        threshold: 0.6 // Trigger when 60% of the video is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const video = entry.target.querySelector('video');
+            if (entry.isIntersecting) {
+                video.play().catch(error => {
+                    // Autoplay might be blocked by browser until user clicks
+                    console.log("Autoplay prevented");
+                });
+            } else {
+                video.pause();
+                video.currentTime = 0; // Optional: reset video when scrolled away
+            }
+        });
+    }, options);
+
+    document.querySelectorAll('.reel').forEach(reel => {
+        observer.observe(reel);
+    });
+});
+
+</script>
+
+{% endblock %}

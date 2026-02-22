@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block title %}Explore{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/explore.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<header class="header">
+    <input type="text" placeholder="Поиск">
+</header>
+
+<main class="container">
+    <div class="grid">
+        {% for post in posts %}
+        <a href="{% url 'posts:post_detail' pk=post.pk %}" class="post-link">
+            <div class="item">
+                {% if post.post_type == 'REELS' %}
+                <video src="{{ post.contentUrl.url }}" loop autoplay muted></video>
+                {% elif post.post_type == 'POST' %}
+                <img src="{{ post.contentUrl.url }}" alt="">
+                {% endif %}
+                <div class="post-info">
+                    <span>❤️ {{ post.likes.count }}</span>
+                    <span>💬 {{ post.comments.count|add:post.reply_comment.count }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'js/explore.js' %}"></script>
+
+{% endblock %}
