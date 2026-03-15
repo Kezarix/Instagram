@@ -21,4 +21,6 @@ urlpatterns = [
     path('comment/<int:pk>/reply/', views.reply_comment, name='reply_comment'),
 
     path('reply/<int:pk>/like/', views.toggle_reply_like, name='toggle_reply_like'),
+
+    path('notifications/', views.notifications_view, name='notifications'),
 ]

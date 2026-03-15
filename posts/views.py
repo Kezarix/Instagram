@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import DetailView
 from posts.models import Post, Comment, Like, CommentLike, CommentReply, ReplyCommentLike
 from users.models import UserModel
+from users.models import Notification
 
 
 def explore(request):
@@ -11,30 +12,34 @@ def explore(request):
 
 
 def main_view(request):
-    following = request.user.following.all()
-    following_ids = [follow.id for follow in following]
+    if request.user.is_authenticated:
+        following = request.user.following.all()
+        following_ids = [user.id for user in following]
+    else:
+        following_ids = []
+
     suggested_users = UserModel.objects.exclude(id__in=following_ids)
 
-    post_filter = {"post_type": Post.PostTypeChoice.Post}
+    post_filter = {"post_type": Post.PostTypeChoice.POST}
     if len(following_ids) > 3:
         post_filter['author__in'] = following_ids
 
-    posts = Post.objects.filter(
-        **post_filter
-    ).exclude(
-        author=request.user
-    ).order_by('-created_at')
+    posts = Post.objects.filter(**post_filter).order_by('-created_at')
 
     if request.user.is_authenticated:
-        user_likes = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
+        posts = posts.exclude(author=request.user)
+
+        user_likes = Like.objects.filter(
+            user=request.user
+        ).values_list('post_id', flat=True)
+
         for post in posts:
             post.is_liked = post.id in user_likes
 
-    context = {
+    return render(request, 'index.html', {
         'posts': posts,
         'suggested_users': suggested_users,
-    }
-    return render(request, 'index.html', context)
+    })
 
 
 
@@ -69,11 +74,20 @@ def create_comment(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
     if request.method == 'POST':
-        Comment.objects.create(
+        comment = Comment.objects.create(
             user=request.user,
             post=post,
             text=request.POST.get('text')
         )
+
+        # УВЕДОМЛЕНИЕ: О новом комментарии
+        if post.author != request.user:
+            Notification.objects.create(
+                sender=request.user,
+                receiver=post.author,
+                notification_type='COMMENT',
+                post=post
+            )
 
     return redirect("posts:post_detail", pk=post.pk)
 
@@ -90,19 +104,36 @@ def reply_comment(request, pk):
             reply_comment=request.POST.get('reply_comment')
         )
 
+        # УВЕДОМЛЕНИЕ: Ответ на комментарий
+        if comment.user != request.user:
+            Notification.objects.create(
+                sender=request.user,
+                receiver=comment.user,
+                notification_type='COMMENT',  # Можно добавить отдельный тип REPLY
+                post=comment.post
+            )
+
     return redirect("posts:post_detail", pk=comment.post.pk)
 
 
 @login_required
 def toggle_post_like(request, pk):
     post = get_object_or_404(Post, pk=pk)
-
     like = Like.objects.filter(user=request.user, post=post).first()
 
     if like:
         like.delete()
     else:
         Like.objects.create(user=request.user, post=post)
+
+        # УВЕДОМЛЕНИЕ: О лайке на пост
+        if post.author != request.user:
+            Notification.objects.create(
+                sender=request.user,
+                receiver=post.author,
+                notification_type='LIKE',
+                post=post
+            )
 
     return redirect(request.GET.get("next", "/"))
 
@@ -116,6 +147,14 @@ def toggle_comment_like(request, pk):
         comment_like.delete()
     else:
         CommentLike.objects.create(user=request.user, comment=comment, post=comment.post)
+
+        if comment.user != request.user:
+            Notification.objects.create(
+                sender=request.user,
+                receiver=comment.user,
+                notification_type='LIKE',
+                post=comment.post
+            )
 
     return redirect(request.GET.get("next", "/"))
 
@@ -149,3 +188,14 @@ def create_post_view(request):
             )
             return redirect('users:profile')
     return render(request, 'create_post.html')
+
+
+@login_required
+def notifications_view(request):
+    # Получаем все уведомления текущего пользователя, свежие — сверху
+    notifications = request.user.notifications.all().order_by('-created_at')
+
+    unread = notifications.filter(is_read=False)
+    unread.update(is_read=True)
+
+    return render(request, 'notifications.html', {'notifications': notifications})

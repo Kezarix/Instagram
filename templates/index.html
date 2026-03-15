@@ -491,70 +491,108 @@
         </section>
 
         <!-- Feed Posts -->
-       <section class="feed-posts">
-    {% for post in posts %}
-    <article class="post-card">
-        <div class="post-header" style="display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #efefef;">
-            <div class="author-avatar" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; margin-right: 12px; flex-shrink: 0;">
-                {% if post.author.avatar %}
-                    <img src="{{ post.author.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover;">
-                {% else %}
-                    <img src="{% static 'images/img.png' %}" style="width: 100%; height: 100%; object-fit: cover;">
-                {% endif %}
-            </div>
-            <div class="author-info">
-                <a href="{% url 'users:another-profile' pk=post.author.pk %}" style="font-weight: 600; text-decoration: none; color: black; font-size: 14px;">
-                    {{ post.author.username }}
-                </a>
-            </div>
-        </div>
+        <section class="feed-posts">
+            {% for post in posts %}
+            <article class="post-card">
+                <div class="post-header"
+                     style="display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #efefef;">
 
-        <div class="post-image-container" style="width: 100%; background-color: #000;">
-            {% if post.post_type == 'POST' %}
-                <img src="{{ post.contentUrl.url }}" class="post-image" style="width: 100%; display: block;">
-            {% elif post.post_type == 'REELS' %}
-                <video src="{{ post.contentUrl.url }}" controls style="width: 100%; max-height: 585px; display: block;"></video>
-            {% endif %}
-        </div>
+                    <div class="user-group" style="display: flex; align-items: center; flex-grow: 1;">
 
-        <div class="post-actions">
-            <div class="action-left">
-                <a href="{% url 'posts:toggle_like' pk=post.pk %}?next={{ request.path }}">
-                    <svg width="24" height="24" viewBox="0 0 24 24"
-                         {% if post.is_liked %} fill="#ed4956" stroke="#ed4956" {% else %} fill="none" stroke="currentColor" {% endif %}
-                         stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </a>
-                <a href="{% url 'posts:post_detail' post.id %}" class="action-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                </a>
-            </div>
-            <button class="action-btn save-btn">
-                <i class="fa-regular fa-bookmark"></i>
-            </button>
-        </div>
+                        <div class="author-avatar"
+                             style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; margin-right: 12px; flex-shrink: 0;">
+                            {% if post.author.avatar %}
+                            <img src="{{ post.author.avatar.url }}"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/img.png' %}"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
 
-        <div class="post-stats" style="padding: 0 16px 8px;">
-            <strong>{{ post.likes.count }}</strong> отметок «Нравится»
-        </div>
+                        <a href="{% url 'users:another-profile' pk=post.author.pk %}"
+                           style="font-weight: 600; text-decoration: none; color: #262626; font-size: 14px;">
+                            {{ post.author.username }}
+                        </a>
 
-        {% if post.caption %}
-        <div class="post-caption" style="padding: 0 16px 12px;">
-            <p style="margin: 0;">
-                <a href="{% url 'users:another-profile' pk=post.author.pk %}" style="text-decoration: none; color: black;">
-                    <strong>{{ post.author.username }}</strong>
-                </a>
-                <span style="margin-left: 5px;">{{ post.caption }}</span>
-            </p>
-        </div>
+                    </div>
+                </div>
+
+
+    <div class="post-image-container" style="width: 100%; background-color: #000;">
+        {% if post.post_type == 'POST' %}
+        <img src="{{ post.contentUrl.url }}" class="post-image" style="width: 100%; display: block;">
+        {% elif post.post_type == 'REELS' %}
+        <video src="{{ post.contentUrl.url }}" controls
+               style="width: 100%; max-height: 585px; display: block;"></video>
         {% endif %}
+    </div>
 
-        <div class="post-time" style="padding: 0 16px 12px; font-size: 12px; color: #8e8e8e;">
-            {{ post.created_at|timesince }} назад
+    <div class="post-actions">
+        <div class="action-left">
+            <a href="{% url 'posts:toggle_like' pk=post.pk %}?next={{ request.path }}">
+                <svg width="24" height="24" viewBox="0 0 24 24"
+                     {% if post.is_liked %} fill="#ed4956" stroke="#ed4956" {% else %} fill="none"
+                     stroke="currentColor" {% endif %}
+                     stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </a>
+            <a href="{% url 'posts:post_detail' post.id %}" class="action-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </a>
+
+            <button class="action-btn share-btn" onclick="openShareModal('{{ post.id }}')"
+                    style="background:none; border:none; cursor:pointer; padding:0; margin-left:12px; display:inline-flex; align-items:center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+
+            <div id="share-modal"
+                 style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+                <div style="background:white; width:350px; border-radius:12px; overflow:hidden;">
+                    <div style="padding:15px; border-bottom:1px solid #dbdbdb; text-align:center; font-weight:bold;">
+                        Переслать
+                    </div>
+                    <div id="share-chats-list"
+                         style="max-height:300px; overflow-y:auto; padding:10px;"></div>
+                    <button onclick="closeShareModal()"
+                            style="width:100%; padding:15px; border:none; background:#fafafa; cursor:pointer; border-top:1px solid #dbdbdb;">
+                        Отмена
+                    </button>
+                </div>
+            </div>
         </div>
+        <button class="action-btn save-btn">
+            <i class="fa-regular fa-bookmark"></i>
+        </button>
+    </div>
+
+    <div class="post-stats" style="padding: 0 16px 8px;">
+        <strong>{{ post.likes.count }}</strong> отметок «Нравится»
+    </div>
+
+    {% if post.caption %}
+    <div class="post-caption" style="padding: 0 16px 12px;">
+        <p style="margin: 0;">
+            <a href="{% url 'users:another-profile' pk=post.author.pk %}"
+               style="text-decoration: none; color: black;">
+                <strong>{{ post.author.username }}</strong>
+            </a>
+            <span style="margin-left: 5px;">{{ post.caption }}</span>
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="post-time" style="padding: 0 16px 12px; font-size: 12px; color: #8e8e8e;">
+        {{ post.created_at|timesince }} назад
+    </div>
     </article>
     {% empty %}
     <div class="empty-state">
@@ -562,7 +600,7 @@
         <a href="{% url 'posts:explore' %}" class="explore-btn">Исследовать</a>
     </div>
     {% endfor %}
-</section>
+    </section>
 </div>
 
 <!-- Sidebar -->
@@ -624,5 +662,79 @@
 
 {% block extra_js %}
 <script src="{% static 'js/like.js' %}"></script>
+<script>
+    let currentPostId = null;
 
+    // 1. Открытие модалки и загрузка чатов
+    async function openShareModal(postId) {
+        currentPostId = postId;
+        const modal = document.getElementById('share-modal');
+        const listContainer = document.getElementById('share-chats-list');
+
+        modal.style.display = 'flex';
+        listContainer.innerHTML = '<p style="text-align:center; padding:20px;">Загрузка чатов...</p>';
+
+        try {
+            const response = await fetch('/direct/api/my-chats/');
+            const chats = await response.json();
+            listContainer.innerHTML = '';
+
+            if (chats.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center; padding:20px;">Нет активных чатов</p>';
+                return;
+            }
+
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.style = "display:flex; align-items:center; padding:10px; border-bottom:1px solid #eee;";
+                item.innerHTML = `
+                    <img src="${chat.avatar}" style="width:35px; height:35px; border-radius:50%; margin-right:10px; object-fit:cover;">
+                    <span style="flex:1; font-weight:500;">${chat.username}</span>
+                    <button onclick="sendPostToChat('${chat.dialog_id}', this)"
+                            style="background:#0095f6; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">
+                        Отправить
+                    </button>
+                `;
+                listContainer.appendChild(item);
+            });
+        } catch (err) {
+            listContainer.innerHTML = '<p style="color:red; text-align:center; padding:20px;">Ошибка API</p>';
+        }
+    }
+
+    // 2. Закрытие модалки
+    function closeShareModal() {
+        document.getElementById('share-modal').style.display = 'none';
+    }
+
+    // 3. Отправка через сокет
+    function sendPostToChat(dialogId, btn) {
+        const shareSocket = new WebSocket('ws://' + window.location.host + '/ws/direct/' + dialogId + '/');
+
+        btn.innerText = "Отправка...";
+        btn.disabled = true;
+
+        shareSocket.onopen = function() {
+            shareSocket.send(JSON.stringify({
+                'message': 'SHARE_POST:' + currentPostId
+            }));
+
+            setTimeout(() => {
+                btn.innerText = "Готово!";
+                btn.style.background = "#262626";
+                setTimeout(() => {
+                    shareSocket.close();
+                    closeShareModal();
+                }, 500);
+            }, 300);
+        };
+
+        shareSocket.onerror = function() {
+            alert("Ошибка соединения с чатом");
+            btn.disabled = false;
+            btn.innerText = "Отправить";
+        };
+    }
+</script>
 {% endblock %}
+

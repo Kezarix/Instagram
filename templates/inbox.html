@@ -1,10 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Сообщения • Direct{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Основной контейнер, который встает справа от твоего бара */
+    .direct-wrapper {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        background: #fff;
+    }
+
+    /* Средняя колонка со списком чатов */
+    .chats-column {
+        width: 350px;
+        border-right: 1px solid #dbdbdb;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chats-header {
+        height: 60px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #dbdbdb;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .chats-scroller {
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .chat-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        text-decoration: none;
+        color: #000;
+        transition: 0.1s;
+    }
+
+    .chat-link:hover { background: #fafafa; }
+
+    .user-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        margin-right: 12px;
+        object-fit: cover;
+    }
+
+    /* Правая колонка (заглушка) */
+    .empty-chat-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="direct-wrapper">
+    <div class="chats-column">
+        <div class="chats-header">
+            <span>{{ request.user.username }}</span>
+            <span style="cursor: pointer;">📝</span>
+        </div>
+        <div class="chats-scroller">
+            {% for d in dialogs_with_other %}
+            <a href="{% url 'direct:dialog' d.dialog.id %}" class="chat-link">
+                <img src="{% if d.other_user.avatar %}{{ d.other_user.avatar.url }}{% else %}{% static 'img/default.png' %}{% endif %}" class="user-avatar">
+                <div>
+                    <div style="font-weight: 600; font-size: 14px;">{{ d.other_user.username }}</div>
+                    <div style="color: #8e8e8e; font-size: 14px;">{{ d.dialog.messages.last.text|truncatechars:20 }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="empty-chat-view">
+        <div style="font-size: 60px; margin-bottom: 10px;">💬</div>
+        <h2 style="font-weight: 400; margin: 0;">Ваши сообщения</h2>
+        <p style="color: #8e8e8e; margin-top: 10px;">Выбирайте чат и начинайте общение.</p>
+    </div>
+</div>
+{% endblock %}

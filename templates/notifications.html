@@ -1,10 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="font-weight: 600; margin-bottom: 20px;">Уведомления</h2>
+
+    <div class="notifications-list">
+        {% for n in notifications %}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #efefef; {% if not n.is_read %}background-color: #fafafa;{% endif %}">
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                {% if n.sender.avatar %}
+                <img src="{{ n.sender.avatar.url }}"
+                     style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                     style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+                {% endif %}
+
+                <div style="font-size: 14px;">
+                    <span style="font-weight: 600;">{{ n.sender.username }}</span>
+                    {% if n.notification_type == 'LIKE' %}
+                    поставил(а) лайк на вашу
+                    <a href="{% url 'posts:post_detail' n.post.id %}"
+                       style="text-decoration: none; color: #0095f6; font-weight: 600;">публикацию</a>.
+                    {% elif n.notification_type == 'COMMENT' %}
+                    оставил(а) комментарий:
+                    <span style="color: #8e8e8e;">"{{ n.post.caption|truncatechars:20 }}"</span>
+                    {% endif %}
+                    <div style="color: #8e8e8e; font-size: 12px; margin-top: 4px;">
+                        {{ n.created_at|timesince }} назад
+                    </div>
+                </div>
+            </div>
+
+            {% if n.post %}
+            <a href="{% url 'posts:post_detail' n.post.id %}">
+                <img src="{{ n.post.contentUrl.url }}"
+                     style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px;">
+            </a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="text-align: center; color: #8e8e8e; margin-top: 50px;">
+            У вас пока нет уведомлений.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

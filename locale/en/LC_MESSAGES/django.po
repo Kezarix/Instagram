@@ -1,0 +1,178 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-08 14:53+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\posts\models.py:9
+msgid "History"
+msgstr ""
+
+#: .\posts\models.py:10
+msgid "Post"
+msgstr ""
+
+#: .\posts\models.py:11 .\templates\layouts\left_sidebar.html:48
+msgid "Reels"
+msgstr ""
+
+#: .\posts\models.py:17
+msgid "author"
+msgstr ""
+
+#: .\posts\models.py:23
+msgid "post type"
+msgstr ""
+
+#: .\posts\models.py:28
+msgid "content url"
+msgstr ""
+
+#: .\posts\models.py:34
+msgid "caption"
+msgstr ""
+
+#: .\posts\models.py:39 .\posts\models.py:74 .\posts\models.py:100
+#: .\posts\models.py:150
+msgid "created at"
+msgstr ""
+
+#: .\posts\models.py:45
+msgid "hashtag"
+msgstr ""
+
+#: .\posts\models.py:51
+msgid "location"
+msgstr ""
+
+#: .\posts\models.py:62 .\posts\models.py:86 .\posts\models.py:112
+#: .\posts\models.py:138 .\posts\models.py:173
+msgid "user"
+msgstr ""
+
+#: .\posts\models.py:69 .\posts\models.py:93 .\posts\models.py:126
+#: .\posts\models.py:157 .\users\models.py:83
+msgid "post"
+msgstr ""
+
+#: .\posts\models.py:96
+msgid "text"
+msgstr ""
+
+#: .\posts\models.py:119 .\posts\models.py:145
+msgid "comment"
+msgstr ""
+
+#: .\posts\models.py:161 .\posts\models.py:180
+msgid "reply comment"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:24
+msgid "Home"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:32
+msgid "Search"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:40
+msgid "Explore"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:55
+msgid "Direct"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:63 .\users\models.py:94
+msgid "Notifications"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:71
+msgid "Upload"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:79
+msgid "Profile"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:91
+msgid "More"
+msgstr ""
+
+#: .\templates\layouts\left_sidebar.html:99 .\users\models.py:93
+msgid "Notification"
+msgstr ""
+
+#: .\users\models.py:9
+msgid "avatar"
+msgstr ""
+
+#: .\users\models.py:11
+msgid "bio"
+msgstr ""
+
+#: .\users\models.py:13 .\users\models.py:40 .\users\models.py:86
+msgid "created_at"
+msgstr ""
+
+#: .\users\models.py:23
+msgid "User"
+msgstr ""
+
+#: .\users\models.py:24
+msgid "Users"
+msgstr ""
+
+#: .\users\models.py:32
+msgid "follower"
+msgstr ""
+
+#: .\users\models.py:38
+msgid "following"
+msgstr ""
+
+#: .\users\models.py:46 .\users\models.py:55
+msgid "Follow"
+msgstr ""
+
+#: .\users\models.py:47
+msgid "Follows"
+msgstr ""
+
+#: .\users\models.py:53
+msgid "Like"
+msgstr ""
+
+#: .\users\models.py:54
+msgid "Comment"
+msgstr ""
+
+#: .\users\models.py:64
+msgid "sender"
+msgstr ""
+
+#: .\users\models.py:70
+msgid "receiver"
+msgstr ""
+
+#: .\users\models.py:75
+msgid "notification_type"
+msgstr ""
+
+#: .\users\models.py:87
+msgid "is_read"
+msgstr ""

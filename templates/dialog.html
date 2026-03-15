@@ -1,10 +1,448 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ОБЩИЙ КОНТЕЙНЕР */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+        max-width: 900px;
+        margin: 20px auto;
+        background: #fff;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+    }
+
+    /* ШАПКА ЧАТА */
+    .chat-header {
+        padding: 15px;
+        border-bottom: 1px solid #dbdbdb;
+        font-weight: 600;
+        text-align: center;
+    }
+
+
+    .msg-author{
+    font-size:11px;
+    color:#DDA0DD;
+    margin-bottom:4px;
+}
+
+
+    .msg-author-title
+    {
+
+     font-size:16px;
+     color:#F0E68C;
+     margin-bottom:8px;
+     margin-left:12px;
+
+
+    }
+
+
+
+   #msg-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Расстояние между сообщениями */
+    padding: 15px;
+    overflow-y: auto; /* Скролл */
+    height: 450px; /* Фиксированная высота, чтобы не «ползло» */
+    background-color: #ffffff;
+    scroll-behavior: smooth;
+}
+
+.shared-post {
+    width: 230px;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+}
+
+.msg-row{
+    display:flex;
+    align-items:flex-end;
+    margin-bottom:12px;
+}
+
+
+.msg-row.mine{
+    justify-content:flex-end;
+}
+
+
+.msg-avatar{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    margin-right:8px;
+    object-fit:cover;
+}
+
+
+.msg-bubble{
+    max-width:260px;
+    position:relative;
+}
+
+
+.msg-username{
+    font-size:12px;
+    font-weight:600;
+    margin-bottom:4px;
+    color:#262626;
+}
+
+.msg-text{
+    background:#efefef;
+    padding:10px 14px;
+    border-radius:18px;
+    font-size:14px;
+}
+
+.mine .msg-text{
+    background:#0095f6;
+    color:white;
+}
+
+
+.msg-time{
+    font-size:10px;
+    color:#8e8e8e;
+    margin-top:3px;
+    text-align:right;
+}
+
+.chat-date{
+    text-align:center;
+    font-size:12px;
+    color:#8e8e8e;
+    margin:18px 0;
+}
+
+
+.post-preview{
+    position:relative;
+    display:block;
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.post-preview img{
+    width:230px;
+    height:320px;
+    object-fit:cover;
+
+    border-radius:18px;
+}
+
+
+.post-overlay{
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-weight:600;
+    font-size:13px;
+    text-shadow:0 1px 4px rgba(0,0,0,0.6);
+}
+
+#msg-list{
+    padding:20px;
+    background:#fafafa;
+}
+
+.post-action{
+ margin-left:8px;
+ color:#708090;
+ font-size:13px;
+
+}
+.post-card {
+    width: 250px;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 5px;
+}
+
+.post-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.post-card-wrapper {
+    width: 240px;
+    border-radius: 15px;
+    border: 1px solid #dbdbdb;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+
+
+/* Чтобы карточки постов не ломали верстку */
+.msg img {
+    max-width: 100%;
+    display: block;
+}
+
+    /* СТИЛИ ПУЗЫРЬКОВ */
+    .msg {
+    max-width: 75%;
+    padding: 8px 12px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+}
+
+    /* МОИ (СИНИЕ) */
+    .my-msg {
+    align-self: flex-end;
+    background-color: #0095f6;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+    /* ЧУЖИЕ (СЕРЫЕ) */
+   .her-msg {
+    align-self: flex-start;
+    background-color: #efefef;
+    color: #262626;
+    border-bottom-left-radius: 4px;
+}
+
+    /* НИЖНЯЯ ПАНЕЛЬ С ВВОДОМ */
+    .chat-footer {
+        padding: 20px;
+        border-top: 1px solid #dbdbdb;
+    }
+
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid #dbdbdb;
+        border-radius: 22px;
+        padding: 5px 15px;
+    }
+
+    #chat-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    #msg-btn {
+        background: none;
+        border: none;
+        color: #0095f6;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    #msg-btn:disabled {
+        opacity: 0.3;
+    }
+
+    @keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(5px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+</style>
+
+<div class="chat-container">
+    <div class="chat-header">
+        Чат с пользователем
+    </div>
+
+    <div id="msg-list">
+        {% for m in messages %}
+
+        {% ifchanged m.created_at.date %}
+        <div class="chat-date">
+            {{ m.created_at|date:"M d, Y, H:i" }}
+        </div>
+        {% endifchanged %}
+
+        <div class="msg-row {% if m.sender == request.user %}mine{% endif %}">
+
+            {% if m.sender != request.user %}
+            <img class="msg-avatar"
+                 src="{% if m.sender.profile.avatar %}{{ m.sender.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ m.sender.username }}{% endif %}">
+            {% endif %}
+
+            <div class="msg-bubble">
+
+                {% if m.sender != request.user %}
+                <div class="msg-username">{{ m.sender.username }}</div>
+                {% endif %}
+
+                {% if m.is_share %}
+                <a href="/{{ m.post.id }}/" class="post-preview">
+
+                    <img src="{{ m.post.contentUrl.url }}">
+
+                    <div class="post-overlay">
+                        {{ m.post.author.username }}
+                    </div>
+
+                </a>
+
+                {% else %}
+                <div class="msg-text">
+                    {{ m.text }}
+                </div>
+                {% endif %}
+
+                <div class="msg-time">
+                    {{ m.created_at|date:"H:i" }}
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+    </div>
+
+
+    <div class="chat-footer">
+        <div class="input-wrapper">
+            <input type="text" id="chat-input" placeholder="Напишите сообщение..." autocomplete="off">
+            <button id="msg-btn" type="button">Отправить</button>
+        </div>
+    </div>
+</div>
+<script>
+    // Оборачиваем всё в проверку загрузки страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        const dialogId = "{{ dialog.id }}";
+        const currentUsername = "{{ request.user.username }}";
+
+        // Находим элементы страницы
+        const msgList = document.getElementById('msg-list');
+        const msgInput = document.getElementById('chat-input');
+        const msgBtn = document.getElementById('msg-btn');
+
+        if (!msgList || !msgInput || !msgBtn) {
+            console.error("Критическая ошибка: Элементы чата не найдены на странице!");
+            return;
+        }
+
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+
+const chatSocket = new WebSocket(
+    protocol + '://' + window.location.host + '/ws/direct/' + dialogId + '/'
+);
+
+        function scrollToBottom() {
+            msgList.scrollTop = msgList.scrollHeight;
+        }
+
+        chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    console.log("Данные получены:", data);
+
+    const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const isMine = data.sender === currentUsername;
+
+    let htmlContent = "";
+
+    if (data.is_share === true) {
+
+        const pId = data.post_id;
+        const pImg = data.post_image;
+        const pAuthor = data.post_author || "Пользователь";
+
+        htmlContent = `
+        <div class="msg-row ${isMine ? 'mine' : ''}">
+
+            ${!isMine ? `<img class="msg-avatar" src="https://ui-avatars.com/api/?name=${data.sender}">` : ``}
+
+            <div class="msg-bubble">
+
+                ${!isMine ? `<div class="msg-username">${data.sender}</div>` : ``}
+
+                <a href="/${pId}/" class="post-preview">
+                    <img src="${pImg}">
+                    <div class="post-overlay">${pAuthor}</div>
+                </a>
+
+                <div class="msg-time">${time}</div>
+
+            </div>
+        </div>
+        `;
+
+    } else {
+
+        htmlContent = `
+        <div class="msg-row ${isMine ? 'mine' : ''}">
+
+            ${!isMine ? `<img class="msg-avatar" src="https://ui-avatars.com/api/?name=${data.sender}">` : ``}
+
+            <div class="msg-bubble">
+
+                ${!isMine ? `<div class="msg-username">${data.sender}</div>` : ``}
+
+                <div class="msg-text">${data.message}</div>
+
+                <div class="msg-time">${time}</div>
+
+            </div>
+        </div>
+        `;
+    }
+
+    msgList.insertAdjacentHTML('beforeend', htmlContent);
+    scrollToBottom();
+};
+
+        // ЛОГИКА ОТПРАВКИ
+        msgBtn.onclick = function() {
+    const message = msgInput.value.trim();
+
+    if (message !== "") {
+        chatSocket.send(JSON.stringify({
+            message: message
+        }));
+
+        msgInput.value = '';
+    }
+};
+
+msgInput.addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        msgBtn.click();
+    }
+});
+
+        msgInput.onkeyup = function(e) {
+            if (e.keyCode === 13) msgBtn.click();
+        };
+
+        chatSocket.onopen = () => {
+            console.log("Чат подключен и готов!");
+            scrollToBottom();
+        };
+    });
+</script>
+{% endblock %}

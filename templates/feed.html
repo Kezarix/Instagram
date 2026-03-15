@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 {% load static %}
 
 {% block title %}Главная • Instagram{% endblock %}
@@ -71,27 +71,23 @@
                 <div class="post-actions">
                     <div class="action-left">
                         <button class="action-btn like-btn" data-post-id="{{ post.id }}">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
                         </button>
+
                         <button class="action-btn comment-btn">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
                         </button>
-                        <button class="action-btn share-btn">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2">
-                                <circle cx="18" cy="5" r="3"></circle>
-                                <circle cx="6" cy="12" r="3"></circle>
-                                <circle cx="18" cy="19" r="3"></circle>
-                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                            </svg>
-                        </button>
+
+                        <button class="action-btn share-btn" onclick="openShareModal('{{ post.id }}')" style="background:none; border:none; cursor:pointer; padding:0; margin-left:10px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+    </svg>
+</button>
                     </div>
                     <button class="action-btn save-btn">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -204,56 +200,138 @@
     <div class="story-content" id="story-content"></div>
 </div>
 
+
+<div id="share-modal"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; display:flex; justify-content:center; align-items:center;">
+    <div style="background:white; width:400px; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; max-height:80vh;">
+        <div style="padding:15px; border-bottom:1px solid #dbdbdb; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:600;">Переслать</span>
+            <button onclick="closeShareModal()" style="background:none; border:none; font-size:20px; cursor:pointer;">
+                &times;
+            </button>
+        </div>
+        <div id="share-chats-list" style="overflow-y:auto; padding:10px;">
+            <p style="text-align:center; color:grey;">Загрузка чатов...</p>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block extra_js %}
 
+{% block extra_js %}
 <script>
+    // --- ЛОГИКА СТОРИЗ ---
+    document.querySelectorAll(".story-avatar").forEach(avatar => {
+        avatar.addEventListener("click", async () => {
+            const userId = avatar.dataset.userId;
+            const response = await fetch(`/stories/${userId}/`);
+            const stories = await response.json();
 
-    <script>
-document.querySelectorAll(".story-avatar").forEach(avatar => {
-  avatar.addEventListener("click", async () => {
-    const userId = avatar.dataset.userId;
+            if (!stories.length) return;
 
-    const response = await fetch(`/stories/${userId}/`);
-    const stories = await response.json();
+            const modal = document.getElementById("story-modal");
+            const content = document.getElementById("story-content");
+            let index = 0;
 
-    if (!stories.length) return;
+            function showStory(i) {
+                const story = stories[i];
+                content.innerHTML = "";
+                if (story.type === "photo") {
+                    content.innerHTML = `<img src="${story.src}">`;
+                    setTimeout(nextStory, 5000);
+                } else {
+                    content.innerHTML = `<video src="${story.src}" autoplay></video>`;
+                    content.querySelector("video").onended = nextStory;
+                }
+            }
 
-    const modal = document.getElementById("story-modal");
-    const content = document.getElementById("story-content");
+            function nextStory() {
+                index++;
+                if (index < stories.length) {
+                    showStory(index);
+                } else {
+                    modal.classList.add("hidden");
+                }
+            }
 
-    let index = 0;
+            modal.classList.remove("hidden");
+            showStory(index);
+            modal.onclick = () => modal.classList.add("hidden");
+        });
+    });
 
-    function showStory(i) {
-      const story = stories[i];
-      content.innerHTML = "";
+    // --- ЛОГИКА ПЕРЕСЫЛКИ (SHARE) ---
+    let currentPostId = null;
 
-      if (story.type === "photo") {
-        content.innerHTML = `<img src="${story.src}">`;
-        setTimeout(nextStory, 5000);
-      } else {
-        content.innerHTML = `<video src="${story.src}" autoplay></video>`;
-        content.querySelector("video").onended = nextStory;
-      }
+    async function openShareModal(postId) {
+        currentPostId = postId;
+        const modal = document.getElementById('share-modal');
+        modal.style.display = 'flex';
+
+        const listContainer = document.getElementById('share-chats-list');
+        listContainer.innerHTML = '<p style="text-align:center; color:grey;">Загрузка чатов...</p>';
+
+        try {
+            const response = await fetch('/direct/api/my-chats/');
+            const chats = await response.json();
+
+            listContainer.innerHTML = '';
+            if (chats.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center; color:grey;">У вас еще нет активных чатов</p>';
+                return;
+            }
+
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.style = "display:flex; align-items:center; padding:10px; border-bottom:1px solid #fafafa;";
+                item.innerHTML = `
+                    <img src="${chat.avatar}" style="width:40px; height:40px; border-radius:50%; margin-right:10px; object-fit:cover;">
+                    <span style="flex:1; font-weight:500;">${chat.username}</span>
+                    <button onclick="sendPostToChat('${chat.dialog_id}', this)" style="background:#0095f6; color:white; border:none; padding:5px 12px; border-radius:4px; font-weight:600; cursor:pointer;">Отправить</button>
+                `;
+                listContainer.appendChild(item);
+            });
+        } catch (err) {
+            listContainer.innerHTML = '<p style="padding:20px; text-align:center; color:red;">Ошибка загрузки</p>';
+        }
     }
 
-    function nextStory() {
-      index++;
-      if (index < stories.length) {
-        showStory(index);
-      } else {
-        modal.classList.add("hidden");
-      }
+    function closeShareModal() {
+        document.getElementById('share-modal').style.display = 'none';
     }
 
-    modal.classList.remove("hidden");
-    showStory(index);
+    function sendPostToChat(dialogId, btnElement) {
+        // Создаем временное соединение для отправки
+        const shareSocket = new WebSocket('ws://' + window.location.host + '/ws/direct/' + dialogId + '/');
 
-    modal.onclick = () => modal.classList.add("hidden");
-  });
-});
+        // Меняем текст на кнопке для фидбека
+        btnElement.innerText = "Отправка...";
+        btnElement.disabled = true;
+
+        shareSocket.onopen = function() {
+            const data = { 'message': `SHARE_POST:${currentPostId}` };
+            shareSocket.send(JSON.stringify(data));
+
+            // Визуальный эффект успеха
+            btnElement.innerText = "Готово!";
+            btnElement.style.background = "#262626";
+
+            setTimeout(() => {
+                shareSocket.close();
+                closeShareModal();
+            }, 500);
+        };
+
+        shareSocket.onerror = function() {
+            alert("Ошибка при отправке");
+            btnElement.innerText = "Ошибка";
+            btnElement.disabled = false;
+        };
+    }
 </script>
+{% endblock %}
 
 
-</script>
