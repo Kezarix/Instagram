@@ -142,4 +142,19 @@ CHANNEL_LAYERS = {
 }
 
 PREFIX_DEFAULT_LANGUAGE = False
+
 CSRF_ALLOW_ALL_ORIGINS = True
+
+# ЭТО КРИТИЧНО для Render (чтобы Django понимал, что HTTPS — это ок)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Добавь доверенные источники явно (на всякий случай для Django 6.0)
+CSRF_TRUSTED_ORIGINS = [
+    'https://instagram-qrek.onrender.com',
+    'http://127.0.0.1',
+    'http://localhost',
+]
+
+# Чтобы куки не блокировались при локальной разработке
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
