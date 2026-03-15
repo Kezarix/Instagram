@@ -3,12 +3,13 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 from posts.models import Post
 from users.forms import RegisterForm, LoginForm
 from users.models import UserModel, Follow
 
-
+@csrf_exempt
 def registration_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)

@@ -268,78 +268,78 @@ background-color: #0095f6;
     </style>
 </head>
 <body>
-    <div class="register-container">
+<div class="register-container">
 
 
-        <!-- Right Side -->
-        <div class="register-right">
-            <div class="register-logo">
-                <h1>Instagram</h1>
-            </div>
-            <p class="register-subtitle">Sign up to see photos and videos from your friends.</p>
+    <!-- Right Side -->
+    <div class="register-right">
+        <div class="register-logo">
+            <h1>Instagram</h1>
+        </div>
+        <p class="register-subtitle">Sign up to see photos and videos from your friends.</p>
 
-            <!-- Facebook Button -->
-            <button type="button" class="facebook-btn" onclick="loginWithFacebook()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                Log in with Facebook
-            </button>
+        <!-- Facebook Button -->
+        <button type="button" class="facebook-btn" onclick="loginWithFacebook()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Log in with Facebook
+        </button>
 
-            <div class="divider">OR</div>
+        <div class="divider">OR</div>
 
-            <!-- Registration Form -->
-            <form class="register-form" method="POST">
-                {% csrf_token %}
+        <!-- Registration Form -->
+        <form class="register-form" method="POST" action=".">
+            {% csrf_token %}
 
-                <!-- Error Messages -->
-                {% if form.errors %}
-                    {% for field, errors in form.errors.items %}
-                        {% for error in errors %}
-                            <div class="error-message">{{ error }}</div>
-                        {% endfor %}
-                    {% endfor %}
-                {% endif %}
+            <!-- Error Messages -->
+            {% if form.errors %}
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <div class="error-message">{{ error }}</div>
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
 
-                {% if messages %}
-                    {% for message in messages %}
-<div class="error-message">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="error-message">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
 
-                <input
+            <input
                     type="text"
                     name="username"
                     class="form-input"
                     placeholder="Username"
                     required
-                >
+            >
 
-                <input
+            <input
                     type="text"
                     name="first_name"
                     class="form-input"
                     placeholder="First Name"
                     required
-                >
+            >
 
-                <input
+            <input
                     type="text"
                     name="last_name"
                     class="form-input"
                     placeholder="Last Name"
                     required
-                >
+            >
 
-                <input
+            <input
                     type="email"
                     name="email"
                     class="form-input"
                     placeholder="Email"
                     required
-                >
+            >
 
-                <input
+            <input
                     type="password"
                     name="password1"
                     class="form-input"
@@ -347,9 +347,9 @@ background-color: #0095f6;
                     required
                     minlength="8"
                     id="password"
-                >
+            >
 
-                <input
+            <input
                     type="password"
                     name="password2"
                     class="form-input"
@@ -357,77 +357,76 @@ background-color: #0095f6;
                     required
                     minlength="8"
                     id="password2"
-                />
+            />
 
 
-                <button type="submit" class="register-btn" id="register-btn">
-                    Sign up
-                </button>
-            </form>
+            <button type="submit" class="register-btn" id="register-btn">
+                Sign up
+            </button>
+        </form>
 
-            <p class="terms-text">
-                By signing up, you agree to our
-                <a href="#" class="terms-link">Terms</a>,
-                <a href="#" class="terms-link">Privacy Policy</a> and
-                <a href="#" class="terms-link">Cookies Policy</a>.
-            </p>
+        <p class="terms-text">
+            By signing up, you agree to our
+            <a href="#" class="terms-link">Terms</a>,
+            <a href="#" class="terms-link">Privacy Policy</a> and
+            <a href="#" class="terms-link">Cookies Policy</a>.
+        </p>
 
-            <div class="login-link">
-                Have an account? <a href="{% url 'users:login' %}">Log in</a>
+        <div class="login-link">
+            Have an account? <a href="{% url 'users:login' %}">Log in</a>
+        </div>
+        <!-- App Download -->
+        <div class="app-download">
+            <p>Get the app.</p>
+            <div class="app-buttons">
+                <img src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png" alt="Download on App Store">
+                <img src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png" alt="Get it on Google Play">
             </div>
-            <!-- App Download -->
-    <div class="app-download">
-        <p>Get the app.</p>
-        <div class="app-buttons">
-            <img src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png" alt="Download on App Store">
-            <img src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png" alt="Get it on Google Play">
         </div>
     </div>
-        </div>
 
-    </div>
-
+</div>
 
 
-    <script>
-        // Password confirmation validation
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('.register-form');
-            const password = document.getElementById('password');
-            const passwordConfirm = document.getElementById('password2');
-            const submitBtn = document.getElementById('register-btn');
+<script>
+    // Password confirmation validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.register-form');
+        const password = document.getElementById('password');
+        const passwordConfirm = document.getElementById('password2');
+        const submitBtn = document.getElementById('register-btn');
 
-            function validatePasswords() {
-                if (password.value && passwordConfirm.value) {
-                    if (password.value !== passwordConfirm.value) {
-                        passwordConfirm.setCustomValidity('Passwords do not match');
-                        passwordConfirm.classList.add('error');
-                    } else {
-                        passwordConfirm.setCustomValidity('');
-                        passwordConfirm.classList.remove('error');
-                    }
+        function validatePasswords() {
+            if (password.value && passwordConfirm.value) {
+                if (password.value !== passwordConfirm.value) {
+                    passwordConfirm.setCustomValidity('Passwords do not match');
+                    passwordConfirm.classList.add('error');
+                } else {
+                    passwordConfirm.setCustomValidity('');
+                    passwordConfirm.classList.remove('error');
                 }
             }
-
-            password.addEventListener('input', validatePasswords);
-            passwordConfirm.addEventListener('input', validatePasswords);
-
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                validatePasswords();
-
-                if (!form.checkValidity()) {
-                    e.preventDefault();
-                    return;
-                }
-
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Creating Account...';
-            });
-        });
-function loginWithFacebook() {
-            alert('Facebook login integration would go here');
         }
-    </script>
+
+        password.addEventListener('input', validatePasswords);
+        passwordConfirm.addEventListener('input', validatePasswords);
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            validatePasswords();
+
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+        });
+    });
+function loginWithFacebook() {
+        alert('Facebook login integration would go here');
+    }
+</script>
 </body>
 </html>

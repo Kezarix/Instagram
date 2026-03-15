@@ -7,7 +7,7 @@ from users.models import Notification
 
 
 def explore(request):
-    posts = Post.objects.exclude(post_type=Post.PostTypeChoice.History).order_by('-created_at')[:30]
+    posts = Post.objects.exclude(post_type=Post.PostTypeChoice.HISTORY).order_by('-created_at')[:30]
     return render(request, 'explore.html', {'posts': posts})
 
 
@@ -46,7 +46,7 @@ def main_view(request):
 def reels_page(request):
     reels = (
         Post.objects.filter(
-            post_type=Post.PostTypeChoice.Reels
+            post_type=Post.PostTypeChoice.REELS
         ).order_by('-created_at')
     )
 
