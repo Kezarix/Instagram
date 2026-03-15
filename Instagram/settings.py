@@ -142,3 +142,4 @@ CHANNEL_LAYERS = {
 }
 
 PREFIX_DEFAULT_LANGUAGE = False
+CSRF_TRUSTED_ORIGINS = ['https://instagram-qrek.onrender.com']
